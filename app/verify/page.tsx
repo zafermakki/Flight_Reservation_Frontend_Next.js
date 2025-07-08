@@ -41,6 +41,30 @@ const VerifyPage = () => {
     }
   }
 
+  const handleResendVerification = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/auth/resend-verification/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+      const data = await response.json();
+
+      if(response.ok) {
+        setSuccess(data.message);
+        setError('');
+      } else {
+        setError(data.message);
+        setSuccess('');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('error when try sending ver code!');
+    }
+  }
+
   return (
     <div className="min-h-screen bg-teal-500 flex items-center justify-center">
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
@@ -61,11 +85,18 @@ const VerifyPage = () => {
           />
 
           <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2 px-4 bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
-          >
-            {loading ? 'Verifying...' : 'Verify'}
+              type="submit"
+              disabled={loading}
+              className="w-full py-2 px-4 bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
+            >
+              {loading ? 'Verifying...' : 'Verify'}
+          </button>
+
+          <button
+              onClick={handleResendVerification}
+              className="w-full py-2 px-4 bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
+            >
+              Resend Code
           </button>
         </form>
 
