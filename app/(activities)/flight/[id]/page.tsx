@@ -15,6 +15,7 @@ import FlightIcon from '@mui/icons-material/Flight';
 import AvTimerIcon from '@mui/icons-material/AvTimer';
 
 import { motion } from 'framer-motion';
+import BookingModal from '../../../modal/Booking';
 
 const fadeInUp = {
     hidden: { opacity: 0, y: 30 },
@@ -31,6 +32,8 @@ const FlightDetailsPage = () => {
   const [flight, setFlight] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
+
+  const [openModal, setOpenModal] = useState(false);
 
   useEffect(() => {
     const fetchFlight = async () => {
@@ -219,6 +222,7 @@ const FlightDetailsPage = () => {
                 borderRadius: 3,
                 '&:hover': { bgcolor: '#2bbbad' },
               }}
+              onClick={() => setOpenModal(true)}
             >
               Book Now
             </Button>
@@ -226,6 +230,7 @@ const FlightDetailsPage = () => {
         </Box>
       </Paper>
     </motion.div>
+    <BookingModal open={openModal} onClose={() => setOpenModal(false)} flightId={1} />
   </Box>
   );
 };
