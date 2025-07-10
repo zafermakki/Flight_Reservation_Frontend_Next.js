@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
-const Dashboard = () => {
+const Dashboard: React.FC = () => {
 
   const [fromLocation, setFromLocation] = useState('');
   const [toLocation, setToLocation] = useState('');

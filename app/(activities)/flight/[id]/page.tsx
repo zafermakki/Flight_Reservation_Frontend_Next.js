@@ -29,8 +29,8 @@ const FlightDetailsPage = () => {
   const params = useParams();
   const { id } = params;
   const [flight, setFlight] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     const fetchFlight = async () => {
