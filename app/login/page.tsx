@@ -33,6 +33,7 @@ const  Login =() => {
       if (res.ok) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user_id', data.user_id);
+        localStorage.setItem('email', email); // Save the email in localStorage
         router.push('/dashboard'); 
       } else {
         setError(data.error || 'Login failed');
