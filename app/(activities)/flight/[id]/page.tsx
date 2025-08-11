@@ -230,7 +230,16 @@ const FlightDetailsPage = () => {
         </Box>
       </Paper>
     </motion.div>
-    <BookingModal open={openModal} onClose={() => setOpenModal(false)} flightId={1} />
+    <BookingModal 
+      open={openModal} 
+      onClose={() => setOpenModal(false)} 
+      flightId={1} 
+      flightPrices={{
+        price_economy: flight.price_economy || 100,
+        price_business: flight.price_business || 200,
+        price_first_class: flight.price_first_class || 300
+      }}
+    />
   </Box>
   );
 };
