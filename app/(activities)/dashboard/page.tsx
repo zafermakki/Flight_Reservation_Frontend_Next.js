@@ -1,6 +1,6 @@
 'use client'
 
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   TextField,
   Button,
@@ -12,6 +12,7 @@ import {
   TableHead,
   TableRow,
   Paper,
+  MenuItem,
 } from '@mui/material';
 import axios from 'axios';
 
@@ -23,6 +24,30 @@ const Dashboard: React.FC = () => {
   const [endDate, setEndDate] = useState('');
   const [flights, setFlights] = useState([]);
   const [error, setError] = useState('');
+
+  const [fromLocationsList, setFromLocationsList] = useState<string[]>([]);
+  const [toLocationsList, setToLocationsList] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const [fromRes, toRes] = await Promise.all([
+          axios.get('http://127.0.0.1:8000/api/flight_reservation/locations/from/', {
+            headers: { Authorization: `Token ${token}` }
+          }),
+          axios.get('http://127.0.0.1:8000/api/flight_reservation/locations/to/', {
+            headers: { Authorization: `Token ${token}` }
+          })
+        ]);
+        setFromLocationsList(fromRes.data.map((item: any) => item.location));
+        setToLocationsList(toRes.data.map((item: any) => item.location));
+      } catch (err) {
+        console.error('Error fetching locations', err);
+      }
+    }
+    fetchLocations();
+  }, []);
 
   const handleSearch = async () => {
     if (!fromLocation || !toLocation || !startDate || !endDate) {
@@ -73,38 +98,63 @@ const Dashboard: React.FC = () => {
       >
       <Typography variant='h4' mb={3} >Search Flights</Typography>
 
-      <Box display="flex" flexDirection="column" gap={2} mb={3} maxWidth={400}>
-      <TextField
+      {/* جعل عرض حقول البحث أكبر */}
+      <Box 
+        display="flex" 
+        flexDirection="column" 
+        gap={2} 
+        mb={3} 
+        maxWidth={{ xs: '100%', sm: 600, md: 700, lg: 800 }} 
+        width="100%"
+      >
+        <TextField
+          select
           label="From Location"
           value={fromLocation}
           onChange={(e) => setFromLocation(e.target.value)}
           fullWidth
           InputLabelProps={{ style: { color: 'white' } }}
-          InputProps={{ style: { color: 'white' } }}
+          SelectProps={{
+            style: { color: 'white' }
+          }}
           sx={{
+            width: '100%',
             '& .MuiOutlinedInput-root': {
               '& fieldset': { borderColor: '#26a69a' },
               '&:hover fieldset': { borderColor: '#26a69a' },
               '&.Mui-focused fieldset': { borderColor: '#26a69a' },
             },
           }}
-        />
+        >
+          {fromLocationsList.map((loc, index) => (
+            <MenuItem key={index} value={loc}>{loc}</MenuItem>
+          ))}
+        </TextField>
 
+        {/* ✅ To Location Dropdown */}
         <TextField
+          select
           label="To Location"
           value={toLocation}
           onChange={(e) => setToLocation(e.target.value)}
           fullWidth
           InputLabelProps={{ style: { color: 'white' } }}
-          InputProps={{ style: { color: 'white' } }}
+          SelectProps={{
+            style: { color: 'white' }
+          }}
           sx={{
+            width: '100%',
             '& .MuiOutlinedInput-root': {
               '& fieldset': { borderColor: '#26a69a' },
               '&:hover fieldset': { borderColor: '#26a69a' },
               '&.Mui-focused fieldset': { borderColor: '#26a69a' },
             },
           }}
-        />
+        >
+          {toLocationsList.map((loc, index) => (
+            <MenuItem key={index} value={loc}>{loc}</MenuItem>
+          ))}
+        </TextField>
 
         <TextField
           type="date"
@@ -115,6 +165,7 @@ const Dashboard: React.FC = () => {
           InputLabelProps={{ shrink: true, style: { color: 'white' } }}
           InputProps={{ style: { color: 'white' } }}
           sx={{
+            width: '100%',
             '& input[type="date"]::-webkit-calendar-picker-indicator': {
               filter: 'invert(1)',
             },
@@ -135,6 +186,7 @@ const Dashboard: React.FC = () => {
           InputLabelProps={{ shrink: true, style: { color: 'white' } }}
           InputProps={{ style: { color: 'white' } }}
           sx={{
+            width: '100%',
             '& input[type="date"]::-webkit-calendar-picker-indicator': {
               filter: 'invert(1)',
             },
@@ -145,8 +197,17 @@ const Dashboard: React.FC = () => {
             },
           }}
         />
-        <Button variant='contained' onClick={handleSearch} sx={{bgcolor:'#26a69a'}}>
-              Search
+        <Button 
+          variant='contained' 
+          onClick={handleSearch} 
+          sx={{
+            bgcolor:'#26a69a',
+            width: '100%',
+            fontSize: '1.1rem',
+            py: 1.5
+          }}
+        >
+          Search
         </Button>
       </Box>
       {error && (

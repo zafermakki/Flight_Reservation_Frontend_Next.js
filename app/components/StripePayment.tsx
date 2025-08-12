@@ -11,7 +11,7 @@ const stripePromise = loadStripe(STRIPE_CONFIG.publishableKey);
 
 interface StripePaymentProps {
   amount: number;
-  onSuccess: () => void;
+  onSuccess: (payment_intent_id: string) => void;
   onCancel: () => void;
 }
 
@@ -36,7 +36,8 @@ const CheckoutForm: React.FC<StripePaymentProps> = ({ amount, onSuccess, onCance
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Payment success
-      onSuccess();
+      const simulatedPaymentIntentId = `pi_test_${Date.now()}`;
+      onSuccess(simulatedPaymentIntentId);
     } catch (err) {
       setError('Payment failed. Please try again.');
     } finally {
