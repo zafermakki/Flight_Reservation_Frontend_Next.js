@@ -13,6 +13,8 @@ import {
   TableRow,
   Paper,
   MenuItem,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import axios from 'axios';
 
@@ -22,8 +24,10 @@ const Dashboard: React.FC = () => {
   const [toLocation, setToLocation] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [flightNumber, setFlightNumber] = useState('');
   const [flights, setFlights] = useState([]);
   const [error, setError] = useState('');
+  const [showTip, setShowTip] = useState(false);
 
   const [fromLocationsList, setFromLocationsList] = useState<string[]>([]);
   const [toLocationsList, setToLocationsList] = useState<string[]>([]);
@@ -49,27 +53,45 @@ const Dashboard: React.FC = () => {
     fetchLocations();
   }, []);
 
-  const handleSearch = async () => {
-    if (!fromLocation || !toLocation || !startDate || !endDate) {
-      setError('All Fields are required');
-      return;
+  useEffect(() => {
+    const shouldShowTip = localStorage.getItem('showDashboardTip');
+    if (shouldShowTip === '1') {
+      setShowTip(true);
+      localStorage.removeItem('showDashboardTip');
     }
+  }, []);
+
+  const handleCloseTip = (_event?: unknown, reason?: string) => {
+    if (reason === 'clickaway') return;
+    setShowTip(false);
+  };
+
+  const handleSearch = async () => {
     try {
       setError('');
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://127.0.0.1:8000/api/flight_reservation/search/', {
-        params: {
+      let params: any = {};
+  
+      if (flightNumber) {
+        params.flight_number = flightNumber;
+      } else {
+        if (!fromLocation || !toLocation || !startDate || !endDate) {
+          setError('All Fields are required');
+          return;
+        }
+        params = {
           from_location: fromLocation,
           to_location: toLocation,
           start_date: startDate,
           end_date: endDate,
-        },
-        headers: {
-          Authorization: `Token ${token}`
-        }
+        };
+      }
+  
+      const response = await axios.get('http://127.0.0.1:8000/api/flight_reservation/search/', {
+        params,
+        headers: { Authorization: `Token ${token}` }
       });
       setFlights(response.data);
-      console.log(response.data)
     } catch (err: any) {
       if (err.response?.data?.message) {
         setFlights([]);
@@ -84,6 +106,17 @@ const Dashboard: React.FC = () => {
   
   return (
     <Box p={4}>
+      <Snackbar
+        open={showTip}
+        autoHideDuration={60000}
+        onClose={handleCloseTip}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseTip} severity="info" variant="filled" sx={{ width: '100%',backgroundColor:"#009688" }}>
+          Tip: You can search by entering only the flight number for a direct lookup.
+          Or, leave the flight number field empty and fill in the other fields (From/To and Start/End Date) for an advanced search.
+        </Alert>
+      </Snackbar>
       <Box
         sx={{
           display: 'flex',
@@ -107,6 +140,22 @@ const Dashboard: React.FC = () => {
         maxWidth={{ xs: '100%', sm: 600, md: 700, lg: 800 }} 
         width="100%"
       >
+      <TextField
+        label="Flight Number"
+        value={flightNumber}
+        onChange={(e) => setFlightNumber(e.target.value)}
+        fullWidth
+        InputLabelProps={{ style: { color: 'white' } }}
+        InputProps={{ style: { color: 'white' } }}
+        sx={{
+          width: '100%',
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': { borderColor: '#26a69a' },
+            '&:hover fieldset': { borderColor: '#26a69a' },
+            '&.Mui-focused fieldset': { borderColor: '#26a69a' },
+          },
+        }}
+      />
         <TextField
           select
           label="From Location"

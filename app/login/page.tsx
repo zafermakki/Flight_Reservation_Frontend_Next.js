@@ -34,6 +34,8 @@ const  Login =() => {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user_id', data.user_id);
         localStorage.setItem('email', email); // Save the email in localStorage
+        // Flag to show a one-time tip on dashboard after successful login
+        localStorage.setItem('showDashboardTip', '1');
         router.push('/dashboard'); 
       } else {
         setError(data.error || 'Login failed');

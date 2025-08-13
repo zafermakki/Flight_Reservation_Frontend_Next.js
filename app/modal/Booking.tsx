@@ -168,13 +168,36 @@ const BookingModal: React.FC<BookingModalProps>= ({ open, onClose, flightId, fli
                 setShowPayment(false);
             }, 2000);
         } catch (err: any) {
-            const msg =
-                err?.response?.data?.non_field_errors?.[0] ||
-                err?.response?.data?.detail ||
-                err?.response?.data?.payment ||
-                'Something went wrong.';
-            setError(msg);
-        } finally {
+          console.log(err.response?.data); 
+          let msg = '';
+      
+          if (err?.response?.data) {
+              const data = err.response.data;
+      
+              if (typeof data === 'string') {
+                  // إذا كان الرد نص مباشر
+                  msg = data;
+              } else if (typeof data === 'object') {
+                  // إذا كان الرد كائن، نجلب أول رسالة متاحة
+                  const firstKey = Object.keys(data)[0];
+                  const firstValue = data[firstKey];
+      
+                  if (Array.isArray(firstValue)) {
+                      msg = firstValue[0]; // أول عنصر في المصفوفة
+                  } else if (typeof firstValue === 'string') {
+                      msg = firstValue;
+                  } else {
+                      msg = JSON.stringify(firstValue);
+                  }
+              } else {
+                  msg = JSON.stringify(data);
+              }
+          } else {
+              msg = 'حدث خطأ غير متوقع.';
+          }
+      
+          setError(msg);
+      }  finally {
             setLoading(false);
         }
     };

@@ -233,7 +233,7 @@ const FlightDetailsPage = () => {
     <BookingModal 
       open={openModal} 
       onClose={() => setOpenModal(false)} 
-      flightId={1} 
+      flightId={flight.id} 
       flightPrices={{
         price_economy: flight.price_economy || 100,
         price_business: flight.price_business || 200,
